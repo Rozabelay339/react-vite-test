@@ -147,5 +147,5 @@ describe("GET /movies", () => {
 
     expect(checkRes.status).toBe(404);
     createdMovie = null;
-  });git 
+  });
 });

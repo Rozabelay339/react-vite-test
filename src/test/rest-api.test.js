@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, test, expect } from "vitest";
+import { beforeAll, beforeEach, afterEach, describe, test, expect } from "vitest";
 
 let jwtToken;
 
@@ -8,10 +8,7 @@ beforeAll(async () => {
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: "rozaa",
-        password: "123456",
-      }),
+      body: JSON.stringify({ username: "rozaa", password: "123456" }),
     }
   );
 
@@ -29,22 +26,29 @@ describe("GET /movies", () => {
         Authorization: `Bearer ${jwtToken}`,
       },
       body: JSON.stringify({
-        title: "Testfilm",
-        description:
-          "Det här är en testfilm som används för att testa API:et med Vitest.",
-        director: "Testregissör",
-        productionYear: 2025,
+        title: "filmFilm",
+        description: "Det här är en testfilm som används för att testa API:et med Vitest.",
+        director: "regissör regissör regissör",
+        productionYear: 2020,
       }),
     });
 
-    console.log("POST-status:", res.status);
     const body = await res.text();
-    console.log("Svar från POST:", body);
-
     try {
       createdMovie = JSON.parse(body);
     } catch (err) {
-      console.error("Kunde inte parsa JSON från POST-svaret:", err);
+      console.error("❌ Kunde inte parsa JSON från POST-svaret:", err);
+    }
+  });
+
+  afterEach(async () => {
+    if (createdMovie?.id) {
+      await fetch(`https://tokenservice-jwt-2025.fly.dev/movies/${createdMovie.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+        },
+      });
     }
   });
 
@@ -60,10 +64,39 @@ describe("GET /movies", () => {
 
     const data = await res.json();
 
-    const movieExists = data.some(
-      (movie) => movie.title === createdMovie.title
-    );
-
+    const movieExists = data.some((movie) => movie.title === createdMovie.title);
     expect(movieExists).toBe(true);
   });
+
+  test("GET /movies returnerar status 200 och en film", async () => {
+    const res = await fetch("https://tokenservice-jwt-2025.fly.dev/movies", {
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    });
+
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(Array.isArray(data)).toBe(true);
+    expect(data.some(m => m.title === createdMovie.title)).toBe(true);
+  });
+
+  test("GET /movies/{id} returnerar rätt film", async () => {
+    const res = await fetch(
+      `https://tokenservice-jwt-2025.fly.dev/movies/${createdMovie?.id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+        },
+      }
+    );
+
+    const text = await res.text();
+    const data = JSON.parse(text);
+
+    expect(res.status).toBe(200);
+    expect(data.title).toBe(createdMovie.title); 
+  });
+
 });

@@ -108,7 +108,7 @@ describe("GET /movies", () => {
   
     if (res.status !== 200) {
       const errorText = await res.text();
-      console.log("Error Response:", errorText); // Log the response body for debugging
+      console.log("Error Response:", errorText); 
     }
   
     expect(res.status).toBe(200);

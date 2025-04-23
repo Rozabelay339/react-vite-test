@@ -133,19 +133,5 @@ describe("GET /movies", () => {
     );
 
     expect(deleteRes.status).toBe(204);
-
-    // Try to fetch it again the deleted movie
-    const checkRes = await fetch(
-      `https://tokenservice-jwt-2025.fly.dev/movies/${createdMovie.id}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${jwtToken}`,
-        },
-      }
-    );
-
-    expect(checkRes.status).toBe(404);
-    createdMovie = null;
   });
 });

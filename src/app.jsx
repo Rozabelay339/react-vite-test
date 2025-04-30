@@ -1,13 +1,25 @@
+import { Link, Routes, Route } from "react-router"
+import Counter from "./pages/Counter"
+import GetMovies from "./pages/GetMovies"
 
-import './app.css'
-import Counter from './components/Counter'
+function App() {
+    return (
+        <>
+            <Link to="/get-movies">
+                <button>Hämta filmer</button>
+            </Link>
 
-export function App() {
-  
-
-  return (
-    <>
-      <Counter />
-    </>
-  )
+            <Link to="/counter">
+                <button>Counter</button>
+            </Link>
+            <main>
+                <Routes>
+                    <Route path="/counter" Component={Counter} />
+                    <Route path="/get-movies" Component={GetMovies} />
+                </Routes>
+            </main>
+        </>
+    )
 }
+
+export default App
